@@ -12,42 +12,58 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 
 public class MyGame implements ApplicationListener {
 
-	Texture animationTexture;
-	TextureRegion temp[][];
-	TextureRegion walkRegion[];
-	TextureRegion keyFrameRegion;
-	
-	
-	public static final int ROWS = 5;//这个图片的行数
-	public static final int COLS = 6;//这个图片的列数
 	
 	SpriteBatch batch;
 	
 	
-	Animation walkAnimation;
+	Animation walkAnimation;//用于实现自定义动画的相应逻辑
+	
+	Texture walkTexture;
+	TextureRegion temp[][];
+	TextureRegion walkRegions[];
+	TextureRegion keyFrameRegion;
 	
 	float stateTime;
+	
+	
 	
 	@Override
 	public void create() {
 		batch = new SpriteBatch();
 		
-		animationTexture = new Texture(Gdx.files.internal("data/animation.png"));
+		walkTexture = new Texture(Gdx.files.internal("data/animation.png"));
 		
-		temp = TextureRegion.split(animationTexture, animationTexture.getWidth()/COLS, animationTexture.getHeight()/ROWS);
+		/**
+		 * split(Texture texture, int tileWidth, int tileHeight)
+		 * 
+		 * texture:需要分割的纹理信息
+		 * tileWisth: 分割后,每一小块的宽度
+		 * tileHeight: 分割后,每一小块的高度
+		 */
+		temp = TextureRegion.split(walkTexture, walkTexture.getWidth()/6, walkTexture.getHeight()/5);//分割texture
 		
-		walkRegion = new TextureRegion[ROWS*COLS];
+		walkRegions = new TextureRegion[5*6];
 		
+		/**
+		 * 把分割后的二维的TextureRegion[][]转化成一维的TextureRegion[]
+		 */
 		int i;
 		int j;
 		int index = 0;
-		for(i = 0 ; i < ROWS ; ++i){
-			for(j = 0 ; j < COLS ; ++j){
-				walkRegion[index++] = temp[i][j];
+		for(i = 0 ; i < 5 ; ++i){
+			for(j = 0 ; j < 6 ; ++j){
+				walkRegions[index++] = temp[i][j];
 			}
 		}
 		
-		walkAnimation = new Animation(0.025f, walkRegion);
+		
+		/**
+		 * Animation(float frameDuration, TextureRegion... keyFrames)
+		 * frameDuration: 每一帧的持续时间
+		 * keyFrames: 用于循环播放的图片集
+		 */
+		walkAnimation = new Animation(0.025f, walkRegions);
+		
 		/**
 		 * normal:正常模式.从头到尾播一遍
 		 * REVERSED:倒播模式。从尾到头播放一次
@@ -55,7 +71,9 @@ public class MyGame implements ApplicationListener {
 		 * LOOP_REVERSED: 倒播的循环方式.不断地从尾到头的循环
 		 * LOOP_PINGPONG: 也是不断循环.但是是向前播几帧然后向后播几帧
 		 */
-		walkAnimation.setPlayMode(walkAnimation.LOOP);//设置这个动画的播放模式
+		walkAnimation.setPlayMode(walkAnimation.LOOP_REVERSED);
+		
+		
 	}
 
 	@Override
@@ -75,18 +93,18 @@ public class MyGame implements ApplicationListener {
 	
 	@Override
 	public void render() {
+		
 		Gdx.gl.glClearColor(1, 1, 1, 1);// 设置背景为白色
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);// 清屏
 		
-		stateTime += Gdx.graphics.getDeltaTime();//获取一个状态下的持续时间
+		stateTime += Gdx.graphics.getDeltaTime();//获取每一帧的持续时间
 		
 //		keyFrameRegion = walkAnimation.getKeyFrame(stateTime, false);//获取当前帧
-		keyFrameRegion = walkAnimation.getKeyFrame(stateTime, true);//当playMode为LOOP_REVERSED的时候,这个时候需要设成true
+		keyFrameRegion = walkAnimation.getKeyFrame(stateTime, true);//获取当前帧
+
 		
 		batch.begin();
-		
-		batch.draw(keyFrameRegion,240,400);//把当前帧画出来
-		
+		batch.draw(keyFrameRegion,240,400);
 		batch.end();
 		
 	}

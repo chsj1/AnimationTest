@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -25,7 +26,8 @@ public class MyGame implements ApplicationListener {
 	
 	float stateTime;
 	
-	
+	TextureAtlas atlas;
+	TextureRegion bgRegion;//±³¾°Í¼Æ¬
 	
 	@Override
 	public void create() {
@@ -73,6 +75,8 @@ public class MyGame implements ApplicationListener {
 		 */
 		walkAnimation.setPlayMode(walkAnimation.LOOP_REVERSED);
 		
+		atlas = new TextureAtlas(Gdx.files.internal("data/xiaorenbg.atlas"));
+		bgRegion = atlas.findRegion("bg");
 		
 	}
 
@@ -104,6 +108,7 @@ public class MyGame implements ApplicationListener {
 
 		
 		batch.begin();
+		batch.draw(bgRegion, 0, 0, 480, 800);
 		batch.draw(keyFrameRegion,240,400);
 		batch.end();
 		
